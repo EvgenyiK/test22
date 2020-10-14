@@ -46,7 +46,6 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 	}
 	
 	sort.Sort(Alphabetic(data))
-	fmt.Println()
 	
 	d := strings.Join(data, ".....")
 
