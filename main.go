@@ -21,6 +21,11 @@ type Data struct{
 	Item string `json:"item"`
 }
 
+type response struct{
+	Req string `json:"res_type"`
+	Result string `json:"result"`
+	Data string `json:"data"`
+}
 
 
 func createAdress(w http.ResponseWriter, r *http.Request)  {
@@ -43,12 +48,17 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 	sort.Sort(Alphabetic(data))
 	fmt.Println()
 	
-	d:=strings.Join(data, ".....")
+	d := strings.Join(data, ".....")
 
-	fmt.Println(d)
-
-	json.NewEncoder(w).Encode(ad)
+	res:= response{
+		Req: ad.Req,
+		Result: ad.Result,
+		Data: d,
+	}
+	
+	json.NewEncoder(w).Encode(res)
 }
+
 
 type Alphabetic []string
 
@@ -66,8 +76,6 @@ func (list Alphabetic) Less(i, j int) bool {
     }
     return si_lower < sj_lower
 }
-
-
 
 
 
