@@ -48,7 +48,7 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 	
 
 	t:= searchSort(data)
-	d := strings.Join(t, " ")
+	d := strings.Join(t, "||")
 	e:= remove_quotes(d)
 	
 
