@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"sort"
+
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -33,7 +34,7 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 	defer r.Body.Close()
 	var ad Adress
 	err:=json.NewDecoder(r.Body).Decode(&ad)
-	if err != nil {
+	if err != nil{
 		ad.Result = "fail"
 		log.Fatalf("Unable to decode the request body. %v", err)
 	} else {
@@ -45,43 +46,70 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 		data = append(data, fmt.Sprint(v))
 	}
 	
-	sort.Sort(Alphabetic(data))
+
+	t:= searchSort(data)
+	d := strings.Join(t, " ")
+	e:= remove_quotes(d)
 	
-	d := strings.Join(data, ".....")
 
 	res:= response{
 		Req: ad.Req,
 		Result: ad.Result,
-		Data: d,
+		Data: e,
 	}
 	
 	json.NewEncoder(w).Encode(res)
 }
 
 
-type Alphabetic []string
 
-func (list Alphabetic) Len() int { return len(list) }
 
-func (list Alphabetic) Swap(i, j int) { list[i], list[j] = list[j], list[i] }
-
-func (list Alphabetic) Less(i, j int) bool {
-    var si string = list[i]
-    var sj string = list[j]
-    var si_lower = strings.ToLower(si)
-    var sj_lower = strings.ToLower(sj)
-    if si_lower == sj_lower {
-        return si < sj
-    }
-    return si_lower < sj_lower
+func search(docs []string, term string) []string {
+	var str []string
+    for _, doc := range docs {
+        if strings.Contains(doc, term) {
+				str = append(str, doc+"...")
+		}
+	}
+	return str
 }
 
+func searchSort(t []string) []string {
+	var answ []string
+	c:= search(t,"CA")
+	m:= search(t,"MA")
+	o:= search(t,"OK")
+	p:= search(t,"PA")
+	v:= search(t,"VA")
 
+	answ = append(answ, fmt.Sprintf("California: %s",c))
+	answ = append(answ, fmt.Sprintf("Massachusec: %s",m))
+	answ = append(answ, fmt.Sprintf("Oklahoma: %s",o))
+	answ = append(answ, fmt.Sprintf("Pensylvania: %s",p))
+	answ = append(answ, fmt.Sprintf("Virginia: %s",v))
 
+	fmt.Println("California: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",c)))
+	fmt.Println("Massachusec: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",m)))
+	fmt.Println("Oklahoma: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",o)))
+	fmt.Println("Pensylvania: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",p)))
+	fmt.Println("Virginia: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",v)))
+
+	return answ
+}
+
+func remove_quotes(s string) string {
+    var b bytes.Buffer
+    for _, r := range (s) {
+        if r != '{' && r != '}' && r != '[' && r != ']' {
+            b.WriteRune(r)
+        }
+    }
+ 
+	return b.String()
+}
 
 func main()  {
 	r:= mux.NewRouter()
 	r.HandleFunc("/", createAdress).Methods("POST")
-	fmt.Println("start server")
 	log.Fatal(http.ListenAndServe(":8008", r))
 }
