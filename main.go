@@ -15,12 +15,11 @@ import (
 type Adress struct{
 	Req string `json:"req_type"`
 	Result string 
-	Data []Data	`json:"data"`
+	Data []struct{
+		Item string `json:"item"`
+	}	`json:"data"`
 }
 
-type Data struct{
-	Item string `json:"item"`
-}
 
 type response struct{
 	Req string `json:"res_type"`
@@ -49,7 +48,7 @@ func createAdress(w http.ResponseWriter, r *http.Request)  {
 
 	t:= searchSort(data)
 	d := strings.Join(t, "||")
-	e:= remove_quotes(d)
+	e:= removeQuotes(d)
 	
 
 	res:= response{
@@ -88,16 +87,16 @@ func searchSort(t []string) []string {
 	answ = append(answ, fmt.Sprintf("Pensylvania: %s",p))
 	answ = append(answ, fmt.Sprintf("Virginia: %s",v))
 
-	fmt.Println("California: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",c)))
-	fmt.Println("Massachusec: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",m)))
-	fmt.Println("Oklahoma: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",o)))
-	fmt.Println("Pensylvania: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",p)))
-	fmt.Println("Virginia: "+"\n"+".....^",remove_quotes(fmt.Sprintf("%s",v)))
+	fmt.Println("California: "+"\n"+".....^",removeQuotes(fmt.Sprintf("%s",c)))
+	fmt.Println("Massachusec: "+"\n"+".....^",removeQuotes(fmt.Sprintf("%s",m)))
+	fmt.Println("Oklahoma: "+"\n"+".....^",removeQuotes(fmt.Sprintf("%s",o)))
+	fmt.Println("Pensylvania: "+"\n"+".....^",removeQuotes(fmt.Sprintf("%s",p)))
+	fmt.Println("Virginia: "+"\n"+".....^",removeQuotes(fmt.Sprintf("%s",v)))
 
 	return answ
 }
 
-func remove_quotes(s string) string {
+func removeQuotes(s string) string {
     var b bytes.Buffer
     for _, r := range (s) {
         if r != '{' && r != '}' && r != '[' && r != ']' {
